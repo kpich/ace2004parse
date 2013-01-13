@@ -1,0 +1,4 @@
+This is a little library to get access to parses for ACE 2004 data.
+
+In particular, there is a method to get dependencies relevant to a span of text,
+as indexed by the ACE 2004 dataset.
