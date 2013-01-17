@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 
 public class ACE2004Parse {
 
@@ -30,7 +33,11 @@ public class ACE2004Parse {
     try {
       InputStream in = new GZIPInputStream(new FileInputStream(
           new File(PARSE_DIR, parseFilename)));
+      SAXReader reader = new SAXReader();
+      Document doc = reader.read(in);
     } catch (IOException e) {
+      e.printStackTrace();
+    } catch (DocumentException e) {
       e.printStackTrace();
     }
   }
