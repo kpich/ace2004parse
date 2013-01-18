@@ -23,6 +23,13 @@ public class ACE2004Parse {
   private int offset = -1;
 
   /**
+   * Array as long as the number of characters in the document; for each
+   * character, gives its word number.
+   */
+  private int[] wordArray;
+
+
+  /**
    * Ctor allowing you to load a parse for a specific document
    */
   public ACE2004Parse(String docID) {
@@ -35,6 +42,8 @@ public class ACE2004Parse {
           new File(PARSE_DIR, parseFilename)));
       SAXReader reader = new SAXReader();
       Document doc = reader.read(in);
+      populateWordArray(doc);
+      //System.out.println(doc.asXML());
     } catch (IOException e) {
       e.printStackTrace();
     } catch (DocumentException e) {
@@ -68,6 +77,12 @@ public class ACE2004Parse {
       e.printStackTrace();
     }
     assert this.offset != -1;
+  }
+
+  private void populateWordArray(Document doc) {
+    List li = doc.selectNodes("/root/document/sentences");
+    System.out.println(li.size());
+    //private int[] wordArray;
   }
 
 

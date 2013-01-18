@@ -16,10 +16,13 @@
 
     <target name="clean">
         <delete dir="${build.dir}"/>
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${jar.dir}"/>
     </target>
 
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${jar.dir}"/>
         <javac srcdir="${src.dir}"
                destdir="${classes.dir}"
                debug="true"
