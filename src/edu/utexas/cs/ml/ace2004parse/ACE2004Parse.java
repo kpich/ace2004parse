@@ -27,6 +27,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * Main Class, provides interface to get at Dependency Parse of ACE 2004
+ * sentence by span extent.
+ *
+ * @TODO investigate performance hit of using XPath as terribly as done here.
+ */
 public class ACE2004Parse {
 
   /**
@@ -113,13 +119,8 @@ public class ACE2004Parse {
   }
 
   private void populateTokenLocations(Document doc) {
-    // TODO investigate performance hit of creating XPath objects over and over
     try {
-      XPathFactory xFactory = XPathFactory.newInstance();
-      XPath xpath = xFactory.newXPath();
-      XPathExpression expr = xpath.compile("//sentence");
-      NodeList sentNodes =
-          (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+      NodeList sentNodes = getSentenceNodes(doc);
       this.tokenLocations = new TokenLocation[getNumChars(sentNodes)];
       for (int i = 0; i < sentNodes.getLength(); i++){
         NodeList wordNodes = getTokenNodesForSent(sentNodes.item(i));
@@ -140,7 +141,34 @@ public class ACE2004Parse {
 
   private void populateLocationToDepMap(Document doc) {
     this.locationToDeps = new HashMap<TokenLocation, List<Dependency>>();
+    try {
+      NodeList sentNodes = getSentenceNodes(doc);
+      for (int i = 0; i < sentNodes.getLength(); i++) {
+        NodeList depNodes = getCollapsedDependencyNodes(sentNodes.item(i));
+        for (int j = 0; j < depNodes.getLength(); j++) {
+          Dependency dep = depNodeToDependency(depNodes.item(j));
+        }
+      }
+    } catch (XPathExpressionException e) {
+      e.printStackTrace();
+    }
   }
+
+  private Dependency depNodeToDependency(Node depNode) {
+    Dependency dep = null;
+    try {
+      String type = getDepType(depNode);
+      int governorIndex = getGovernorIndex(depNode);
+      int dependentIndex = getDependentIndex(depNode);
+      System.out.println(governorIndex);
+      System.out.println(dependentIndex);
+    } catch (XPathExpressionException e) {
+      e.printStackTrace();
+    }
+    assert dep != null;
+    return dep;
+  }
+
 
   private int getNumChars(NodeList sentNodes) {
     assert sentNodes.getLength() > 0;
@@ -164,6 +192,41 @@ public class ACE2004Parse {
     return length;
   }
 
+  private String getDepType(Node depNode) {
+    return depNode.getAttributes().getNamedItem("type").getNodeValue();
+  }
+
+  private int getGovernorIndex(Node depNode)
+          throws XPathExpressionException {
+    Node gov = (Node) XPathFactory.newInstance().newXPath()
+                                  .compile("governor")
+                                  .evaluate(depNode, XPathConstants.NODE);
+    return Integer.parseInt(gov.getAttributes().getNamedItem("idx")
+                                               .getNodeValue());
+  }
+
+  private int getDependentIndex(Node depNode)
+          throws XPathExpressionException {
+    Node gov = (Node) XPathFactory.newInstance().newXPath()
+                                  .compile("dependent")
+                                  .evaluate(depNode, XPathConstants.NODE);
+    return Integer.parseInt(gov.getAttributes().getNamedItem("idx")
+                                               .getNodeValue());
+  }
+
+  private NodeList getSentenceNodes(Document doc)
+          throws XPathExpressionException {
+    return (NodeList) XPathFactory.newInstance().newXPath()
+                                  .compile("//sentence")
+                                  .evaluate(doc, XPathConstants.NODESET);
+  }
+
+  private NodeList getCollapsedDependencyNodes(Node sent)
+          throws XPathExpressionException {
+    return (NodeList) XPathFactory.newInstance().newXPath()
+                                  .compile("collapsed-dependencies/dep")
+                                  .evaluate(sent, XPathConstants.NODESET);
+  }
 
   private int getCharacterOffsetBegin(Node token)
           throws XPathExpressionException {
