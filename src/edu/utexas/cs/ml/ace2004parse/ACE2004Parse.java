@@ -7,7 +7,10 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -41,6 +44,12 @@ public class ACE2004Parse {
   private TokenLocation[] tokenLocations;
 
   /**
+   * this is a map from TokenLocations (representing instances of tokens) to
+   * the dependencies that somehow involve them.
+   */
+  private Map<TokenLocation, List<Dependency>> locationToDeps;
+
+  /**
    * Ctor allowing you to load a parse for a specific document
    */
   public ACE2004Parse(String docID) {
@@ -56,8 +65,7 @@ public class ACE2004Parse {
       DocumentBuilder builder = factory.newDocumentBuilder();
       Document doc = builder.parse(in);
       populateTokenLocations(doc);
-      System.out.println(Arrays.toString(tokenLocations));
-      populateWordToDepMap(doc);
+      populateLocationToDepMap(doc);
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ParserConfigurationException e) {
@@ -73,6 +81,15 @@ public class ACE2004Parse {
    * CoreNLP Dependency Parse.
    */
   public List<Event> getEventsInSpan(int lhsChar, int rhsChar) {
+    return null;
+  }
+
+  /**
+   * This method returns dependencies (according to the collapsed dependency
+   * parse output by stanford corenlp) that mention a word in the span
+   * between lhsChar and rhsChar (inclusive).
+   */
+  public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
     return null;
   }
 
@@ -121,7 +138,8 @@ public class ACE2004Parse {
     }
   }
 
-  private void populateWordToDepMap(Document doc) {
+  private void populateLocationToDepMap(Document doc) {
+    this.locationToDeps = new HashMap<TokenLocation, List<Dependency>>();
   }
 
   private int getNumChars(NodeList sentNodes) {
