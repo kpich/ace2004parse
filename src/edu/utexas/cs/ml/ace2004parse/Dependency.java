@@ -25,5 +25,9 @@ public class Dependency {
   public TokenLocation getDependent() {
     return this.dependent;
   }
+
+  public String toString() {
+    return "([" + type + "]" + governor + ";" + dependent + ")";
+  }
 }
 

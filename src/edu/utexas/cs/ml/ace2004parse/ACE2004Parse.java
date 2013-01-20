@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -72,6 +73,7 @@ public class ACE2004Parse {
       Document doc = builder.parse(in);
       populateTokenLocations(doc);
       populateLocationToDepMap(doc);
+      //DBG_printLocToDepMap();
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ParserConfigurationException e) {
@@ -146,7 +148,9 @@ public class ACE2004Parse {
       for (int i = 0; i < sentNodes.getLength(); i++) {
         NodeList depNodes = getCollapsedDependencyNodes(sentNodes.item(i));
         for (int j = 0; j < depNodes.getLength(); j++) {
-          Dependency dep = depNodeToDependency(depNodes.item(j));
+          Dependency dep = depNodeToDependency(depNodes.item(j), i + 1);
+          appendDepToMap(dep.getGovernor(), dep);
+          appendDepToMap(dep.getDependent(), dep);
         }
       }
     } catch (XPathExpressionException e) {
@@ -154,14 +158,23 @@ public class ACE2004Parse {
     }
   }
 
-  private Dependency depNodeToDependency(Node depNode) {
+  private void appendDepToMap(TokenLocation loc, Dependency dep) {
+    if (!this.locationToDeps.containsKey(loc)) {
+      this.locationToDeps.put(loc, new ArrayList<Dependency>());
+    }
+    List<Dependency> deps = this.locationToDeps.get(loc);
+    deps.add(dep);
+  }
+
+  private Dependency depNodeToDependency(Node depNode, int sentID) {
     Dependency dep = null;
     try {
       String type = getDepType(depNode);
       int governorIndex = getGovernorIndex(depNode);
       int dependentIndex = getDependentIndex(depNode);
-      System.out.println(governorIndex);
-      System.out.println(dependentIndex);
+      dep = new Dependency(type,
+                           new TokenLocation(sentID, governorIndex),
+                           new TokenLocation(sentID, dependentIndex));
     } catch (XPathExpressionException e) {
       e.printStackTrace();
     }
@@ -255,6 +268,14 @@ public class ACE2004Parse {
     return (NodeList) XPathFactory.newInstance().newXPath()
                       .compile("tokens/token")
                       .evaluate(sent, XPathConstants.NODESET);
+  }
+
+  private void DBG_printLocToDepMap() {
+    Iterator it = this.locationToDeps.entrySet().iterator();
+    while (it.hasNext()) {
+        Map.Entry pairs = (Map.Entry)it.next();
+        System.out.println(pairs.getKey() + " = " + pairs.getValue());
+    }
   }
 
 
