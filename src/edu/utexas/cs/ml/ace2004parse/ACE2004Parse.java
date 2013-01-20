@@ -8,9 +8,20 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.SAXReader;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class ACE2004Parse {
 
@@ -29,6 +40,12 @@ public class ACE2004Parse {
   private int[] wordArray;
 
 
+
+
+
+
+
+
   /**
    * Ctor allowing you to load a parse for a specific document
    */
@@ -36,17 +53,20 @@ public class ACE2004Parse {
     String parseFilename = docID + ".parse.xml.gz";
     String offsetFilename = docID + ".offset";
     readOffset(new File(PARSE_DIR, offsetFilename));
-    System.out.println(this.offset);
     try {
       InputStream in = new GZIPInputStream(new FileInputStream(
           new File(PARSE_DIR, parseFilename)));
-      SAXReader reader = new SAXReader();
-      Document doc = reader.read(in);
+
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setNamespaceAware(true);
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      Document doc = builder.parse(in);
       populateWordArray(doc);
-      //System.out.println(doc.asXML());
     } catch (IOException e) {
       e.printStackTrace();
-    } catch (DocumentException e) {
+    } catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    } catch (SAXException e) {
       e.printStackTrace();
     }
   }
@@ -80,9 +100,73 @@ public class ACE2004Parse {
   }
 
   private void populateWordArray(Document doc) {
-    List li = doc.selectNodes("/root/document/sentences");
-    System.out.println(li.size());
-    //private int[] wordArray;
+    // TODO investigate performance hit of creating XPath objects over and over
+    try {
+      XPathFactory xFactory = XPathFactory.newInstance();
+      XPath xpath = xFactory.newXPath();
+      XPathExpression expr = xpath.compile("//sentence");
+      NodeList sentNodes =
+          (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+      this.wordArray = new int[getNumChars(sentNodes)];
+      System.out.println(this.wordArray.length);
+      for (int i=0; i < sentNodes.getLength(); i++){
+        NodeList wordNodes = getTokenNodesForSent(sentNodes.item(i));
+      }
+    } catch (XPathExpressionException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private int getNumChars(NodeList sentNodes) {
+    assert sentNodes.getLength() > 0;
+    int length = -1;
+    Node lastSent = sentNodes.item(sentNodes.getLength() - 1);
+    try {
+      NodeList tokenNodes = getTokenNodesForSent(lastSent);
+      Node lastToken = tokenNodes.item(tokenNodes.getLength() - 1);
+      // each token is of the form
+      // <token id="N">
+      //   <word>to</word>
+      //   ...
+      //   <CharacterOffsetBegin>12</CharacterOffsetBegin>
+      //   <CharacterOffsetEnd>14</CharacterOffsetEnd>
+      // </token>
+      length = getCharacterOffsetEnd(lastToken);
+    } catch (XPathExpressionException e) {
+      e.printStackTrace();
+    }
+    assert length != -1;
+    return length;
+  }
+
+
+  private int getCharacterOffsetBegin(Node token)
+          throws XPathExpressionException {
+    return getIntegerTextProperty(token, "CharacterOffsetBegin");
+  }
+
+  private int getCharacterOffsetEnd(Node token)
+          throws XPathExpressionException {
+    return getIntegerTextProperty(token, "CharacterOffsetEnd");
+  }
+
+  /**
+   * Takes a node that has <prop>[number]</prop> as a child, returns
+   * parsed num.
+   */
+  private int getIntegerTextProperty(Node n, String prop)
+          throws XPathExpressionException {
+    Node intNode = (Node) XPathFactory.newInstance().newXPath()
+                                      .compile(prop)
+                                      .evaluate(n, XPathConstants.NODE);
+    return Integer.parseInt(intNode.getFirstChild().getNodeValue());
+  }
+
+  private NodeList getTokenNodesForSent(Node sent)
+          throws XPathExpressionException {
+    return (NodeList) XPathFactory.newInstance().newXPath()
+                      .compile("tokens/token")
+                      .evaluate(sent, XPathConstants.NODESET);
   }
 
 
