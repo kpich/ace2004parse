@@ -1,4 +1,4 @@
-<project name="ACE2004Parse" basedir="." default="main">
+<project name="ACE2004Parse" basedir="." default="test">
 
   <property name="src.dir"     value="src"/>
 
@@ -51,8 +51,12 @@
     </java>
   </target>
 
-  <target name="clean-build" depends="clean,jar"/>
+  <target name="test" depends="jar">
+    <junit haltonfailure="true" printsummary="true">
+      <test name="edu.utexas.cs.ml.ace2004parse.ACE2004ParseTest"/>
+    </junit>
+  </target>
 
-  <target name="main" depends="clean,run"/>
+  <target name="clean-build" depends="clean,jar"/>
 
 </project>
