@@ -1,5 +1,8 @@
 <project name="ACE2004Parse" basedir="." default="test">
 
+  <!-- TODO: change jar target so that test files aren't included
+  -->
+
   <property name="src.dir"     value="src"/>
 
   <property name="lib.dir"     value="lib"/>
@@ -52,8 +55,13 @@
   </target>
 
   <target name="test" depends="jar">
-    <junit haltonfailure="true" printsummary="true">
+    <junit haltonerror="true" >
+    <!-- <junit haltonerror="true" printsummary="withOutAndErr" > -->
       <test name="edu.utexas.cs.ml.ace2004parse.ACE2004ParseTest"/>
+      <classpath>
+        <pathelement path="${jar.dir}/${ant.project.name}.jar" />
+      </classpath>
+      <formatter type="plain" usefile="false" />
     </junit>
   </target>
 
