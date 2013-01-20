@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -35,16 +36,14 @@ public class ACE2004Parse {
 
   /**
    * Array as long as the number of characters in the document; for each
+   * character, gives its sentence number.
+   */
+  private int[] sentArray;
+  /**
+   * Array as long as the number of characters in the document; for each
    * character, gives its word number.
    */
   private int[] wordArray;
-
-
-
-
-
-
-
 
   /**
    * Ctor allowing you to load a parse for a specific document
@@ -61,7 +60,9 @@ public class ACE2004Parse {
       factory.setNamespaceAware(true);
       DocumentBuilder builder = factory.newDocumentBuilder();
       Document doc = builder.parse(in);
-      populateWordArray(doc);
+      populateSentAndWordArrays(doc);
+      System.out.println(Arrays.toString(this.wordArray));
+      System.out.println(Arrays.toString(this.sentArray));
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ParserConfigurationException e) {
@@ -99,7 +100,7 @@ public class ACE2004Parse {
     assert this.offset != -1;
   }
 
-  private void populateWordArray(Document doc) {
+  private void populateSentAndWordArrays(Document doc) {
     // TODO investigate performance hit of creating XPath objects over and over
     try {
       XPathFactory xFactory = XPathFactory.newInstance();
@@ -107,10 +108,21 @@ public class ACE2004Parse {
       XPathExpression expr = xpath.compile("//sentence");
       NodeList sentNodes =
           (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-      this.wordArray = new int[getNumChars(sentNodes)];
+      int numChars = getNumChars(sentNodes);
+      this.wordArray = new int[numChars];
+      this.sentArray = new int[numChars];
       System.out.println(this.wordArray.length);
-      for (int i=0; i < sentNodes.getLength(); i++){
+      for (int i = 0; i < sentNodes.getLength(); i++){
         NodeList wordNodes = getTokenNodesForSent(sentNodes.item(i));
+        for (int j = 0; j < wordNodes.getLength(); j++) {
+          int lb = getCharacterOffsetBegin(wordNodes.item(j));
+          int ub = getCharacterOffsetEnd(wordNodes.item(j));
+          for (int k = lb; k < ub; k++) {
+            // add 1 because the CoreNLP offsets are 1-indexed
+            this.wordArray[k] = j + 1;
+            this.sentArray[k] = i + 1;
+          }
+        }
       }
     } catch (XPathExpressionException e) {
       e.printStackTrace();
