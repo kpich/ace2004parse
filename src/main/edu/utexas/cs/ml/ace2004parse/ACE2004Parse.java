@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -57,20 +58,45 @@ public class ACE2004Parse {
   private Map<TokenLocation, List<Dependency>> locationToDeps;
 
   /**
-   * Ctor allowing you to load a parse for a specific document
+   * Takes a docID, finds the file according to PARSE_DIR.
    */
   public ACE2004Parse(String docID) {
-    String parseFilename = docID + ".parse.xml.gz";
-    String offsetFilename = docID + ".offset";
-    readOffset(new File(PARSE_DIR, offsetFilename));
-    try {
-      InputStream in = new GZIPInputStream(new FileInputStream(
-          new File(PARSE_DIR, parseFilename)));
+    this(getXMLStream(docID), getOffsetStream(docID));
+  }
 
+  private static InputStream getXMLStream(String docID) {
+    String parseFilename = docID + ".parse.xml.gz";
+    InputStream is = null;
+    try {
+      is = new GZIPInputStream(new FileInputStream(
+          new File(PARSE_DIR, parseFilename)));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return is;
+  }
+
+  private static InputStream getOffsetStream(String docID) {
+    String offsetFilename = docID + ".offset";
+    InputStream is = null;
+    try {
+      is = new FileInputStream(new File(PARSE_DIR, offsetFilename));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return is;
+  }
+
+  /**
+   * Takes an InputStream pointing to the XML and the offset file.
+   */
+  public ACE2004Parse(InputStream xmlStream, InputStream offsetStream) {
+    readOffset(offsetStream);
+    try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
       DocumentBuilder builder = factory.newDocumentBuilder();
-      Document doc = builder.parse(in);
+      Document doc = builder.parse(xmlStream);
       populateTokenLocations(doc);
       populateLocationToDepMap(doc);
       //DBG_printLocToDepMap();
@@ -101,9 +127,10 @@ public class ACE2004Parse {
     return null;
   }
 
-  private void readOffset(File offsetFile) {
+  private void readOffset(InputStream offsetStream) {
     try {
-      BufferedReader b = new BufferedReader(new FileReader(offsetFile));
+      BufferedReader b = new BufferedReader(new InputStreamReader(offsetStream,
+                                                                  "UTF-8"));
       String line;
       while ((line = b.readLine()) != null) {
         if (line.trim().length() > 0) {
