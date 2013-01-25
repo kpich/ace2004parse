@@ -6,7 +6,7 @@
 
 package edu.utexas.cs.ml.ace2004parse;
 
-public class TokenLocation {
+public final class TokenLocation {
     private int sent = -1;
     private int word = -1;
 

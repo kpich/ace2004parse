@@ -1,5 +1,7 @@
 package edu.utexas.cs.ml.ace2004parse;
 
+import java.io.*;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -14,6 +16,8 @@ public class ACE2004ParseTest {
 //    </TEXT>
 //    </DOC>
 
+
+private static final String OFFSET_STRING = "13";
 
 private static final String XML_PARSE_STRING =
   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -161,7 +165,10 @@ private static final String XML_PARSE_STRING =
 
   @Test
   public void testObjectCreationWorks() {
-    ACE2004Parse parse = new ACE2004Parse("NYT20001127.2214.0372");
+    //ACE2004Parse parse = new ACE2004Parse("NYT20001127.2214.0372");
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
   }
 
 }

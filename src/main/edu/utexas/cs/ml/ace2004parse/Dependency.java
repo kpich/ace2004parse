@@ -1,7 +1,7 @@
 package edu.utexas.cs.ml.ace2004parse;
 
 
-public class Dependency {
+public final class Dependency {
 
   private String type;
   private TokenLocation governor;

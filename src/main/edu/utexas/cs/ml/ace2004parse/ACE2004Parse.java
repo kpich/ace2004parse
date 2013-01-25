@@ -52,6 +52,12 @@ public class ACE2004Parse {
   private TokenLocation[] tokenLocations;
 
   /**
+   * In some sense the reverse of tokenLocations: given a (sentencneum, wordnum)
+   * pair, this gives us the information about the token contained in the parse
+   */
+  private Map<TokenLocation, TokenInfo> tokenLocationToInfoMap;
+
+  /**
    * this is a map from TokenLocations (representing instances of tokens) to
    * the dependencies that somehow involve them.
    */
@@ -147,10 +153,14 @@ public class ACE2004Parse {
     assert this.offset != -1;
   }
 
+  /**
+   * This populates both this.TokenLocations and this.tokenLocationToInfoMap.
+   */
   private void populateTokenLocations(Document doc) {
     try {
       NodeList sentNodes = getSentenceNodes(doc);
       this.tokenLocations = new TokenLocation[getNumChars(sentNodes)];
+      this.tokenLocationToInfoMap = new HashMap<TokenLocation, TokenInfo>();
       for (int i = 0; i < sentNodes.getLength(); i++){
         NodeList wordNodes = getTokenNodesForSent(sentNodes.item(i));
         for (int j = 0; j < wordNodes.getLength(); j++) {
@@ -167,6 +177,7 @@ public class ACE2004Parse {
       e.printStackTrace();
     }
   }
+
 
   private void populateLocationToDepMap(Document doc) {
     this.locationToDeps = new HashMap<TokenLocation, List<Dependency>>();
