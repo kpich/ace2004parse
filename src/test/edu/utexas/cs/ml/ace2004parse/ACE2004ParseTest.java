@@ -171,4 +171,21 @@ private static final String XML_PARSE_STRING =
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
   }
 
+  @Test
+  public void testTokenLocationsReturned() {
+    //ACE2004Parse parse = new ACE2004Parse("NYT20001127.2214.0372");
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+  TokenInfo firstInfo = new TokenInfo(1, "Dogs", "dog", 0, 4, "NNS");
+  assertEquals(firstInfo, parse.getTokenAtLocation(new TokenLocation(1, 1)));
+
+  TokenInfo secondInfo = new TokenInfo(2, "are", "be", 5, 8, "VBP");
+  assertEquals(secondInfo, parse.getTokenAtLocation(new TokenLocation(1, 2)));
+
+  TokenInfo thirdInfo = new TokenInfo(1, "Cats", "cat", 15, 19, "NNS");
+  assertEquals(thirdInfo, parse.getTokenAtLocation(new TokenLocation(2, 1)));
+  }
+
+
 }

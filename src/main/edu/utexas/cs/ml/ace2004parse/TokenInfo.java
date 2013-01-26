@@ -21,6 +21,30 @@ public final class TokenInfo {
 
     public TokenInfo(int id, String word, String lemma, int charOffsetBegin,
                      int charOffsetEnd, String pos) {
+      this.id = id;
+      this.word = word;
+      this.lemma = lemma;
+      this.charOffsetBegin = charOffsetBegin;
+      this.charOffsetEnd = charOffsetEnd;
+      this.pos = pos;
+    }
+
+    public boolean equals(Object rhs) {
+      if (rhs instanceof TokenInfo) {
+        TokenInfo rhsTok = (TokenInfo) rhs;
+        return this.id == rhsTok.id &&
+               this.word.equals(rhsTok.word) &&
+               this.lemma.equals(rhsTok.lemma) &&
+               this.charOffsetBegin == rhsTok.charOffsetBegin &&
+               this.charOffsetEnd == rhsTok.charOffsetEnd &&
+               this.pos.equals(rhsTok.pos);
+      }
+      return false;
+    }
+
+    public String toString() {
+      return "[" + id + ", " + word + ", " + lemma + ", " + charOffsetBegin +
+             ", " + charOffsetEnd + ", " + pos + "]";
     }
 
     public int getId() {

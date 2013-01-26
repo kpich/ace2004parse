@@ -70,6 +70,53 @@ public class ACE2004Parse {
     this(getXMLStream(docID), getOffsetStream(docID));
   }
 
+  /**
+   * Takes an InputStream pointing to the XML and the offset file.
+   */
+  public ACE2004Parse(InputStream xmlStream, InputStream offsetStream) {
+    readOffset(offsetStream);
+    try {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setNamespaceAware(true);
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      Document doc = builder.parse(xmlStream);
+      readTokens(doc);
+      populateLocationToDepMap(doc);
+      //DBG_printLocToDepMap();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    } catch (SAXException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * returns null if there's no Token there.
+   */
+  public TokenInfo getTokenAtLocation(TokenLocation loc) {
+    return this.tokenLocationToInfoMap.get(loc);
+  }
+
+  /**
+   * This method returns any events with relations to any NPs inside the
+   * span between lhsChar and rhsChar (inclusive), according to the Stanford
+   * CoreNLP Dependency Parse.
+   */
+  public List<Event> getEventsInSpan(int lhsChar, int rhsChar) {
+    return null;
+  }
+
+  /**
+   * This method returns dependencies (according to the collapsed dependency
+   * parse output by stanford corenlp) that mention a word in the span
+   * between lhsChar and rhsChar (inclusive).
+   */
+  public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
+    return null;
+  }
+
   private static InputStream getXMLStream(String docID) {
     String parseFilename = docID + ".parse.xml.gz";
     InputStream is = null;
@@ -91,46 +138,6 @@ public class ACE2004Parse {
       e.printStackTrace();
     }
     return is;
-  }
-
-  /**
-   * Takes an InputStream pointing to the XML and the offset file.
-   */
-  public ACE2004Parse(InputStream xmlStream, InputStream offsetStream) {
-    readOffset(offsetStream);
-    try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      Document doc = builder.parse(xmlStream);
-      populateTokenLocations(doc);
-      populateLocationToDepMap(doc);
-      //DBG_printLocToDepMap();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    } catch (SAXException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * This method returns any events with relations to any NPs inside the
-   * span between lhsChar and rhsChar (inclusive), according to the Stanford
-   * CoreNLP Dependency Parse.
-   */
-  public List<Event> getEventsInSpan(int lhsChar, int rhsChar) {
-    return null;
-  }
-
-  /**
-   * This method returns dependencies (according to the collapsed dependency
-   * parse output by stanford corenlp) that mention a word in the span
-   * between lhsChar and rhsChar (inclusive).
-   */
-  public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
-    return null;
   }
 
   private void readOffset(InputStream offsetStream) {
@@ -156,7 +163,7 @@ public class ACE2004Parse {
   /**
    * This populates both this.TokenLocations and this.tokenLocationToInfoMap.
    */
-  private void populateTokenLocations(Document doc) {
+  private void readTokens(Document doc) {
     try {
       NodeList sentNodes = getSentenceNodes(doc);
       this.tokenLocations = new TokenLocation[getNumChars(sentNodes)];
@@ -171,6 +178,8 @@ public class ACE2004Parse {
           for (int k = lb; k < ub; k++) {
             this.tokenLocations[k] = tokLocation;
           }
+          this.tokenLocationToInfoMap.put(tokLocation,
+                                          getTokenInfo(wordNodes.item(j)));
         }
       }
     } catch (XPathExpressionException e) {
@@ -289,16 +298,37 @@ public class ACE2004Parse {
     return getIntegerTextProperty(token, "CharacterOffsetEnd");
   }
 
+  private TokenInfo getTokenInfo(Node token)
+          throws XPathExpressionException {
+    int id = Integer.parseInt(token.getAttributes().getNamedItem("id")
+                              .getNodeValue());
+    return new TokenInfo(id, getStringTextProperty(token, "word"),
+                         getStringTextProperty(token, "lemma"),
+                         getCharacterOffsetBegin(token),
+                         getCharacterOffsetEnd(token),
+                         getStringTextProperty(token, "POS"));
+  }
+
+
   /**
    * Takes a node that has <prop>[number]</prop> as a child, returns
    * parsed num.
    */
   private int getIntegerTextProperty(Node n, String prop)
           throws XPathExpressionException {
-    Node intNode = (Node) XPathFactory.newInstance().newXPath()
+    return Integer.parseInt(getStringTextProperty(n, prop));
+  }
+
+  /**
+   * Takes a node that has <prop>[string]</prop> as a child, returns
+   * parsed num.
+   */
+  private String getStringTextProperty(Node n, String prop)
+          throws XPathExpressionException {
+    Node strNode = (Node) XPathFactory.newInstance().newXPath()
                                       .compile(prop)
                                       .evaluate(n, XPathConstants.NODE);
-    return Integer.parseInt(intNode.getFirstChild().getNodeValue());
+    return strNode.getFirstChild().getNodeValue();
   }
 
   private NodeList getTokenNodesForSent(Node sent)
