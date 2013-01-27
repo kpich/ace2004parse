@@ -105,7 +105,7 @@ public class ACE2004Parse {
    * CoreNLP Dependency Parse.
    *
    * lhsChar and rhsChar should be offset (that is, should be indexed like
-   * the annotated ACE corpus).
+   * the annotated ACE 2004 corpus).
    */
   public List<Event> getEventsInSpan(int lhsChar, int rhsChar) {
     return null;
@@ -115,6 +115,9 @@ public class ACE2004Parse {
    * This method returns dependencies (according to the collapsed dependency
    * parse output by stanford corenlp) that mention a word in the span
    * between lhsChar and rhsChar (inclusive).
+   *
+   * lhsChar and rhsChar should be offset (that is, should be indexed like
+   * the annotated ACE 2004 corpus).
    */
   public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
     List<Dependency> res = new ArrayList<Dependency>();
