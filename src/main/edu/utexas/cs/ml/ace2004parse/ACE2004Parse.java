@@ -117,7 +117,17 @@ public class ACE2004Parse {
    * between lhsChar and rhsChar (inclusive).
    */
   public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
-    return null;
+    List<Dependency> res = new ArrayList<Dependency>();
+    int unOffsetLhsChar = Math.max(lhsChar - this.offset, 0);
+    int unOffsetRhsChar = Math.min(rhsChar - this.offset,
+                                   this.tokenLocations.length - 1);
+    for (int i = unOffsetLhsChar; i <= unOffsetRhsChar; i++) {
+      TokenLocation loc = this.tokenLocations[i];
+      if (this.locationToDeps.containsKey(loc)) {
+        res.addAll(this.locationToDeps.get(loc));
+      }
+    }
+    return res;
   }
 
   private static InputStream getXMLStream(String docID) {

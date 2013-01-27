@@ -299,7 +299,7 @@ private static final String XML_PARSE_STRING =
     Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
                                      new TokenLocation(1, 2));
     // (nsubj, dumb, Cats):
-    Dependency dep3 = new Dependency("nsubm", new TokenLocation(2, 3),
+    Dependency dep3 = new Dependency("nsubj", new TokenLocation(2, 3),
                                      new TokenLocation(2, 1));
     // (cop, dumb, are):
     Dependency dep4 = new Dependency("cop", new TokenLocation(2, 3),

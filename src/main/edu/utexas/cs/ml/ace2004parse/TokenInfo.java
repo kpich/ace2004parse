@@ -42,6 +42,17 @@ public final class TokenInfo {
     return false;
   }
 
+  public int hashCode() {
+    int result = 17;
+    result = 31 * result + (id < 0 ? 0 : id);
+    result = 31 * result + (word.hashCode());
+    result = 31 * result + (lemma.hashCode());
+    result = 31 * result + (charOffsetBegin < 0 ? 0 : charOffsetBegin);
+    result = 31 * result + (charOffsetEnd < 0 ? 0 : charOffsetEnd);
+    result = 31 * result + (pos.hashCode());
+    return result;
+  }
+
   public String toString() {
     return "[" + id + ", " + word + ", " + lemma + ", " + charOffsetBegin +
            ", " + charOffsetEnd + ", " + pos + "]";

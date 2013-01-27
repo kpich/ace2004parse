@@ -15,6 +15,14 @@ public final class TokenLocation {
     this.word = word;
   }
 
+  public boolean equals(Object rhs) {
+    if (rhs instanceof TokenLocation) {
+      TokenLocation rhsTok = (TokenLocation) rhs;
+      return this.sent == rhsTok.sent && this.word == rhsTok.word;
+    }
+    return false;
+  }
+
   /**
    * Basically doing what Josh Bloch says to do in Item 9 of Effective Java
    */
@@ -23,14 +31,6 @@ public final class TokenLocation {
     result = 31 * result + (sent == -1 ? 0 : sent);
     result = 31 * result + (word == -1 ? 0 : word);
     return result;
-  }
-
-  public boolean equals(Object rhs) {
-    if (rhs instanceof TokenLocation) {
-      TokenLocation rhsTok = (TokenLocation) rhs;
-      return this.sent == rhsTok.sent && this.word == rhsTok.word;
-    }
-    return false;
   }
 
   public String toString()

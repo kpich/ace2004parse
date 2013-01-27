@@ -15,13 +15,21 @@ public final class Dependency {
   }
 
   public boolean equals(Object rhs) {
-    if (rhs instanceof TokenInfo) {
+    if (rhs instanceof Dependency) {
       Dependency rhsDep = (Dependency) rhs;
       return this.type.equals(rhsDep.type) &&
              this.governor.equals(rhsDep.governor) &&
              this.dependent.equals(rhsDep.dependent);
     }
     return false;
+  }
+
+  public int hashCode() {
+    int result = 17;
+    result = 31 * result + type.hashCode();
+    result = 31 * result + governor.hashCode();
+    result = 31 * result + dependent.hashCode();
+    return result;
   }
 
   public String getType() {

@@ -30,6 +30,14 @@ public class Event {
     return false;
   }
 
+  public int hashCode() {
+    int result = 17;
+    result = 31 * result + lemma.hashCode();
+    result = 31 * result + dep.hashCode();
+    result = 31 * result + tokenInfo.hashCode();
+    return result;
+  }
+
   public String getLemma() {
     return this.lemma;
   }
