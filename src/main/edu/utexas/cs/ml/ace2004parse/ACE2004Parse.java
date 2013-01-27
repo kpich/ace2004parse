@@ -93,7 +93,9 @@ public class ACE2004Parse {
   }
 
   /**
-   * returns null if there's no Token there.
+   * returns null if there's no Token there, otherwise returns the
+   * token at a given (sentence, tokennum) pair, with sentence and tokennum
+   * numbered as output in the Stanford CoreNLP parse.
    */
   public TokenInfo getTokenAtLocation(TokenLocation loc) {
     return this.tokenLocationToInfoMap.get(loc);
