@@ -1,6 +1,7 @@
 package edu.utexas.cs.ml.ace2004parse;
 
 import java.io.*;
+import java.util.*;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -17,6 +18,7 @@ public class ACE2004ParseTest {
 //    </DOC>
 
 
+private static final int OFFSET = 13;
 private static final String OFFSET_STRING = "13";
 
 private static final String XML_PARSE_STRING =
@@ -187,5 +189,127 @@ private static final String XML_PARSE_STRING =
   assertEquals(thirdInfo, parse.getTokenAtLocation(new TokenLocation(2, 1)));
   }
 
+  @Test
+  public void testDependenciesInDependencylessSpan() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 28,
+                                                        OFFSET + 29);
+    assertEquals(new ArrayList<Dependency>(), deps);
+  }
+
+  @Test
+  public void testDependenciesInOutOfRangeSpan() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<Dependency> deps = parse.getDependenciesInSpan(100000, 100001);
+    assertEquals(new ArrayList<Dependency>(), deps);
+
+    deps = parse.getDependenciesInSpan(0, 0);
+    assertEquals(new ArrayList<Dependency>(), deps);
+  }
+
+  @Test
+  public void testDependenciesInPerfectlySizedSpan() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                        OFFSET + 11);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
+
+  @Test
+  public void testDependenciesInSubspan() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    // "ogs" to "fu", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 1,
+                                                        OFFSET + 10);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
+
+  @Test
+  public void testDependenciesInSuperspan() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    // "Dogs" to ".", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                        OFFSET + 12);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
+
+  @Test
+  public void testDependenciesInEntireDocument() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    // "Dogs" to "dumb.", inclusive:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                        OFFSET + 28);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+    // (nsubj, dumb, Cats):
+    Dependency dep3 = new Dependency("nsubm", new TokenLocation(2, 3),
+                                     new TokenLocation(2, 1));
+    // (cop, dumb, are):
+    Dependency dep4 = new Dependency("cop", new TokenLocation(2, 3),
+                                     new TokenLocation(2, 2));
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    expected.add(dep3);
+    expected.add(dep4);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
 
 }

@@ -55,7 +55,7 @@
   </target>
 
   <target name="test" depends="jar">
-    <junit haltonerror="true" >
+    <junit haltonerror="false" >
     <!-- <junit haltonerror="true" printsummary="withOutAndErr" > -->
       <test name="edu.utexas.cs.ml.ace2004parse.ACE2004ParseTest"/>
       <classpath>

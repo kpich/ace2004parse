@@ -20,6 +20,16 @@ public class Event {
     this.tokenInfo = tokenInfo;
   }
 
+  public boolean equals(Object rhs) {
+    if (rhs instanceof Event) {
+      Event rhsEv = (Event) rhs;
+      return this.lemma.equals(rhsEv.lemma) &&
+             this.dep == rhsEv.dep &&
+             this.tokenInfo.equals(rhsEv.tokenInfo);
+    }
+    return false;
+  }
+
   public String getLemma() {
     return this.lemma;
   }

@@ -14,6 +14,16 @@ public final class Dependency {
     this.dependent = dependent;
   }
 
+  public boolean equals(Object rhs) {
+    if (rhs instanceof TokenInfo) {
+      Dependency rhsDep = (Dependency) rhs;
+      return this.type.equals(rhsDep.type) &&
+             this.governor.equals(rhsDep.governor) &&
+             this.dependent.equals(rhsDep.dependent);
+    }
+    return false;
+  }
+
   public String getType() {
     return this.type;
   }
