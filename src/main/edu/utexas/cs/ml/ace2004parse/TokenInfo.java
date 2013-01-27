@@ -45,11 +45,11 @@ public final class TokenInfo {
   public int hashCode() {
     int result = 17;
     result = 31 * result + (id < 0 ? 0 : id);
-    result = 31 * result + (word.hashCode());
-    result = 31 * result + (lemma.hashCode());
+    result = 31 * result + (word == null ? 0 : word.hashCode());
+    result = 31 * result + (word == null ? 0 : lemma.hashCode());
     result = 31 * result + (charOffsetBegin < 0 ? 0 : charOffsetBegin);
     result = 31 * result + (charOffsetEnd < 0 ? 0 : charOffsetEnd);
-    result = 31 * result + (pos.hashCode());
+    result = 31 * result + (pos == null ? 0 : pos.hashCode());
     return result;
   }
 

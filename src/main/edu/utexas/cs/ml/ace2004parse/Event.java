@@ -36,10 +36,10 @@ public class Event {
 
   public int hashCode() {
     int result = 17;
-    result = 31 * result + lemma.hashCode();
-    result = 31 * result + depType.hashCode();
-    result = 31 * result + tokenInfo.hashCode();
-    result = 31 * result + dep.hashCode();
+    result = 31 * result + (lemma == null ? 0 : lemma.hashCode());
+    result = 31 * result + (depType == null ? 0 : depType.hashCode());
+    result = 31 * result + (tokenInfo == null ? 0 : tokenInfo.hashCode());
+    result = 31 * result + (dep == null ? 0 : dep.hashCode());
     return result;
   }
 
@@ -47,7 +47,11 @@ public class Event {
     return this.lemma;
   }
 
-  public DependencyType getDep() {
+  public DependencyType getDepType() {
+    return this.depType;
+  }
+
+  public Dependency getDep() {
     return this.dep;
   }
 

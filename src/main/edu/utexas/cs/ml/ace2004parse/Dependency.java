@@ -26,9 +26,9 @@ public final class Dependency {
 
   public int hashCode() {
     int result = 17;
-    result = 31 * result + type.hashCode();
-    result = 31 * result + governor.hashCode();
-    result = 31 * result + dependent.hashCode();
+    result = 31 * result + (type == null ? 0 : type.hashCode());
+    result = 31 * result + (governor == null ? 0 : governor.hashCode());
+    result = 31 * result + (dependent == null ? 0 : dependent.hashCode());
     return result;
   }
 
