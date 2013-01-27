@@ -17,9 +17,9 @@ public final class Dependency {
   public boolean equals(Object rhs) {
     if (rhs instanceof Dependency) {
       Dependency rhsDep = (Dependency) rhs;
-      return this.type.equals(rhsDep.type) &&
-             this.governor.equals(rhsDep.governor) &&
-             this.dependent.equals(rhsDep.dependent);
+      return (this.type != null && this.type.equals(rhsDep.type)) &&
+             (this.governor != null && this.governor.equals(rhsDep.governor)) &&
+             (this.dependent != null &&this.dependent.equals(rhsDep.dependent));
     }
     return false;
   }

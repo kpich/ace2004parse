@@ -26,10 +26,11 @@ public class Event {
   public boolean equals(Object rhs) {
     if (rhs instanceof Event) {
       Event rhsEv = (Event) rhs;
-      return this.lemma.equals(rhsEv.lemma) &&
+      return (this.lemma != null && this.lemma.equals(rhsEv.lemma)) &&
              this.depType == rhsEv.depType &&
-             this.tokenInfo.equals(rhsEv.tokenInfo) &&
-             this.dep.equals(rhsEv.dep);
+             (this.tokenInfo != null &&
+              this.tokenInfo.equals(rhsEv.tokenInfo)) &&
+             (this.dep != null && this.dep.equals(rhsEv.dep));
     }
     return false;
   }

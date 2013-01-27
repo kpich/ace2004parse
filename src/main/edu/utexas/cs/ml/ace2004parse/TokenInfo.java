@@ -33,11 +33,11 @@ public final class TokenInfo {
     if (rhs instanceof TokenInfo) {
       TokenInfo rhsTok = (TokenInfo) rhs;
       return this.id == rhsTok.id &&
-             this.word.equals(rhsTok.word) &&
-             this.lemma.equals(rhsTok.lemma) &&
+             (this.word != null && this.word.equals(rhsTok.word)) &&
+             (this.lemma != null && this.lemma.equals(rhsTok.lemma)) &&
              this.charOffsetBegin == rhsTok.charOffsetBegin &&
              this.charOffsetEnd == rhsTok.charOffsetEnd &&
-             this.pos.equals(rhsTok.pos);
+             (this.pos != null && this.pos.equals(rhsTok.pos));
     }
     return false;
   }
