@@ -309,7 +309,6 @@ public class ACE2004Parse {
                          getStringTextProperty(token, "POS"));
   }
 
-
   /**
    * Takes a node that has <prop>[number]</prop> as a child, returns
    * parsed num.

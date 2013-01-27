@@ -9,19 +9,26 @@ public class Event {
 
   private String lemma;
   private DependencyType dep;
+  private TokenInfo tokenInfo;
 
   /**
    * Ctor allowing you to load a parse for a specific document
    */
-  public Event(String lemma, DependencyType dep) {
+  public Event(String lemma, DependencyType dep, TokenInfo tokenInfo) {
     this.lemma = lemma;
     this.dep = dep;
+    this.tokenInfo = tokenInfo;
   }
 
   public String getLemma() {
     return this.lemma;
   }
+
   public DependencyType getDep() {
     return this.dep;
+  }
+
+  public TokenInfo getTokenInfo() {
+    return this.tokenInfo;
   }
 }
