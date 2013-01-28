@@ -312,4 +312,5 @@ private static final String XML_PARSE_STRING =
     assertEquals(expected, new HashSet<Dependency>(deps));
   }
 
+
 }
