@@ -312,5 +312,205 @@ private static final String XML_PARSE_STRING =
     assertEquals(expected, new HashSet<Dependency>(deps));
   }
 
+  @Test
+  public void testEmptyPOSGivesNoDependencies() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    List<Dependency> deps =
+        parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11,
+                                    new ArrayList<String>());
+    assertEquals(new ArrayList<String>(), deps);
+  }
+
+  @Test
+  public void testSinglePOSFilterWorks() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<String> posList = new ArrayList<String>();
+    posList.add("NNS");
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                        OFFSET + 11, posList);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+
+    posList = new ArrayList<String>();
+    posList.add("VBP");
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11, posList);
+
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+
+    expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
+
+  @Test
+  public void testTwoPOSFilterWorks() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<String> posList = new ArrayList<String>();
+    posList.add("NNS");
+    posList.add("NN");
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                        OFFSET + 11, posList);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
+
+  @Test
+  public void testSingleDepTypeFilterWorks() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<String> depList = new ArrayList<String>();
+    depList.add("nsubj");
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                        OFFSET + 11, null,
+                                                        depList);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+
+    depList = new ArrayList<String>();
+    depList.add("cop");
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11, null, depList);
+
+    // (cop, fun, are):
+    dep = new Dependency("cop", new TokenLocation(1, 3),
+                         new TokenLocation(1, 2));
+
+    expected = new HashSet<Dependency>();
+    expected.add(dep);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
+
+  @Test
+  public void testTwoDepTypeFilterWorks() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<String> depList = new ArrayList<String>();
+    depList.add("nsubj");
+    depList.add("cop");
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                        OFFSET + 11, null,
+                                                        depList);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
+
+  @Test
+  public void testSingleRelationFilterWorks() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<String> relList = new ArrayList<String>();
+    relList.add("dependent");
+
+    // "Dogs", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 3,
+                                                        null, null, relList);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+
+    relList = new ArrayList<String>();
+    relList.add("governor");
+
+    // "Dogs", inclusive, sent 1:
+    deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 3, null, null,
+                                       relList);
+
+    assertEquals(new ArrayList<Dependency>(), deps);
+  }
+
+  @Test
+  public void testTwoRelationFilterWorks() {
+    ACE2004Parse parse =
+        new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
+                         new ByteArrayInputStream(OFFSET_STRING.getBytes()));
+
+    List<String> relList = new ArrayList<String>();
+    relList.add("governor");
+    relList.add("dependent");
+
+    // "are" to "fun", inclusive, sent 1:
+    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 5,
+                                                        OFFSET + 11, null, null,
+                                                        relList);
+
+    // (nsubj, fun, Dogs):
+    Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
+
+    HashSet<Dependency> expected = new HashSet<Dependency>();
+    expected.add(dep1);
+    expected.add(dep2);
+    assertEquals(expected, new HashSet<Dependency>(deps));
+  }
 
 }
