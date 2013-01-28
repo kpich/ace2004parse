@@ -195,9 +195,9 @@ private static final String XML_PARSE_STRING =
         new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
 
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 28,
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 28,
                                                         OFFSET + 29);
-    assertEquals(new ArrayList<Dependency>(), deps);
+    assertEquals(new HashSet<Dependency>(), deps);
   }
 
   @Test
@@ -206,11 +206,11 @@ private static final String XML_PARSE_STRING =
         new ACE2004Parse(new ByteArrayInputStream(XML_PARSE_STRING.getBytes()),
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
 
-    List<Dependency> deps = parse.getDependenciesInSpan(100000, 100001);
-    assertEquals(new ArrayList<Dependency>(), deps);
+    Set<Dependency> deps = parse.getDependenciesInSpan(100000, 100001);
+    assertEquals(new HashSet<Dependency>(), deps);
 
     deps = parse.getDependenciesInSpan(0, 0);
-    assertEquals(new ArrayList<Dependency>(), deps);
+    assertEquals(new HashSet<Dependency>(), deps);
   }
 
   @Test
@@ -220,8 +220,8 @@ private static final String XML_PARSE_STRING =
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
 
     // "Dogs" to "fun", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
-                                                        OFFSET + 11);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                       OFFSET + 11);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -233,7 +233,7 @@ private static final String XML_PARSE_STRING =
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
     expected.add(dep2);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -243,8 +243,7 @@ private static final String XML_PARSE_STRING =
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
 
     // "ogs" to "fu", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 1,
-                                                        OFFSET + 10);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 1, OFFSET + 10);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -256,7 +255,7 @@ private static final String XML_PARSE_STRING =
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
     expected.add(dep2);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -266,8 +265,7 @@ private static final String XML_PARSE_STRING =
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
 
     // "Dogs" to ".", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
-                                                        OFFSET + 12);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 12);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -279,7 +277,7 @@ private static final String XML_PARSE_STRING =
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
     expected.add(dep2);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -289,8 +287,7 @@ private static final String XML_PARSE_STRING =
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
 
     // "Dogs" to "dumb.", inclusive:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
-                                                        OFFSET + 28);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 28);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -309,7 +306,7 @@ private static final String XML_PARSE_STRING =
     expected.add(dep2);
     expected.add(dep3);
     expected.add(dep4);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -319,10 +316,10 @@ private static final String XML_PARSE_STRING =
                          new ByteArrayInputStream(OFFSET_STRING.getBytes()));
 
     // "Dogs" to "fun", inclusive, sent 1:
-    List<Dependency> deps =
+    Set<Dependency> deps =
         parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11,
                                     new ArrayList<String>());
-    assertEquals(new ArrayList<String>(), deps);
+    assertEquals(new HashSet<String>(), deps);
   }
 
   @Test
@@ -335,7 +332,7 @@ private static final String XML_PARSE_STRING =
     posList.add("NNS");
 
     // "Dogs" to "fun", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
                                                         OFFSET + 11, posList);
 
     // (nsubj, fun, Dogs):
@@ -344,7 +341,7 @@ private static final String XML_PARSE_STRING =
 
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
 
     posList = new ArrayList<String>();
     posList.add("VBP");
@@ -359,7 +356,7 @@ private static final String XML_PARSE_STRING =
     expected = new HashSet<Dependency>();
     expected.add(dep1);
     expected.add(dep2);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -373,8 +370,8 @@ private static final String XML_PARSE_STRING =
     posList.add("NN");
 
     // "Dogs" to "fun", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
-                                                        OFFSET + 11, posList);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11,
+                                                       posList);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -386,7 +383,7 @@ private static final String XML_PARSE_STRING =
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
     expected.add(dep2);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -399,9 +396,9 @@ private static final String XML_PARSE_STRING =
     depList.add("nsubj");
 
     // "Dogs" to "fun", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
-                                                        OFFSET + 11, null,
-                                                        depList);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                       OFFSET + 11, null,
+                                                       depList);
 
     // (nsubj, fun, Dogs):
     Dependency dep = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -409,7 +406,7 @@ private static final String XML_PARSE_STRING =
 
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
 
     depList = new ArrayList<String>();
     depList.add("cop");
@@ -423,7 +420,7 @@ private static final String XML_PARSE_STRING =
 
     expected = new HashSet<Dependency>();
     expected.add(dep);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -437,9 +434,9 @@ private static final String XML_PARSE_STRING =
     depList.add("cop");
 
     // "Dogs" to "fun", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
-                                                        OFFSET + 11, null,
-                                                        depList);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
+                                                       OFFSET + 11, null,
+                                                       depList);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -451,7 +448,7 @@ private static final String XML_PARSE_STRING =
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
     expected.add(dep2);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
   @Test
@@ -464,8 +461,8 @@ private static final String XML_PARSE_STRING =
     relList.add("dependent");
 
     // "Dogs", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 3,
-                                                        null, null, relList);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 3,
+                                                       null, null, relList);
 
     // (nsubj, fun, Dogs):
     Dependency dep = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -473,7 +470,7 @@ private static final String XML_PARSE_STRING =
 
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
 
     relList = new ArrayList<String>();
     relList.add("governor");
@@ -482,7 +479,7 @@ private static final String XML_PARSE_STRING =
     deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 3, null, null,
                                        relList);
 
-    assertEquals(new ArrayList<Dependency>(), deps);
+    assertEquals(new HashSet<Dependency>(), deps);
   }
 
   @Test
@@ -496,9 +493,9 @@ private static final String XML_PARSE_STRING =
     relList.add("dependent");
 
     // "are" to "fun", inclusive, sent 1:
-    List<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 5,
-                                                        OFFSET + 11, null, null,
-                                                        relList);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 5,
+                                                       OFFSET + 11, null, null,
+                                                       relList);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
@@ -510,7 +507,7 @@ private static final String XML_PARSE_STRING =
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
     expected.add(dep2);
-    assertEquals(expected, new HashSet<Dependency>(deps));
+    assertEquals(expected, deps);
   }
 
 }

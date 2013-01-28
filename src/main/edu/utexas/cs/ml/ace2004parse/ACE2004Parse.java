@@ -112,7 +112,7 @@ public class ACE2004Parse {
    * lhsChar and rhsChar should be offset (that is, should be indexed like
    * the annotated ACE 2004 corpus).
    */
-  public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
+  public Set<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
     return getDependenciesInSpan(lhsChar, rhsChar, null, null, null);
   }
 
@@ -126,8 +126,8 @@ public class ACE2004Parse {
    * lhsChar and rhsChar should be offset (that is, should be indexed like
    * the annotated ACE 2004 corpus).
    */
-  public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar,
-                                                Collection<String> allowedPOS) {
+  public Set<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar,
+                                               Collection<String> allowedPOS) {
     return getDependenciesInSpan(lhsChar, rhsChar, allowedPOS, null, null);
   }
 
@@ -143,7 +143,7 @@ public class ACE2004Parse {
    * lhsChar and rhsChar should be offset (that is, should be indexed like
    * the annotated ACE 2004 corpus).
    */
-  public List<Dependency> getDependenciesInSpan(
+  public Set<Dependency> getDependenciesInSpan(
       int lhsChar,
       int rhsChar,
       Collection<String> allowedPOS,
@@ -166,13 +166,13 @@ public class ACE2004Parse {
    * lhsChar and rhsChar should be offset (that is, should be indexed like
    * the annotated ACE 2004 corpus).
    */
-  public List<Dependency> getDependenciesInSpan(
+  public Set<Dependency> getDependenciesInSpan(
       int lhsChar,
       int rhsChar,
       Collection<String> allowedPOS,
       Collection<String> allowedDepTypes,
       Collection<String> allowedRelations) {
-    List<Dependency> res = new ArrayList<Dependency>();
+    Set<Dependency> res = new HashSet<Dependency>();
     int unOffsetLhsChar = Math.max(lhsChar - this.offset, 0);
     int unOffsetRhsChar = Math.min(rhsChar - this.offset,
                                    this.tokenLocations.length - 1);
