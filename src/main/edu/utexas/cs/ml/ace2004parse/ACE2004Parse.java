@@ -11,9 +11,11 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -174,14 +176,50 @@ public class ACE2004Parse {
     int unOffsetLhsChar = Math.max(lhsChar - this.offset, 0);
     int unOffsetRhsChar = Math.min(rhsChar - this.offset,
                                    this.tokenLocations.length - 1);
+    Set<String> allowedPOSSet = getSetFromCollection(allowedPOS);
+    Set<String> allowedDepTypeSet = getSetFromCollection(allowedDepTypes);
+    Set<String> allowedRelationSet = getSetFromCollection(allowedRelations);
     for (int i = unOffsetLhsChar; i <= unOffsetRhsChar; i++) {
       TokenLocation loc = this.tokenLocations[i];
       if (this.locationToDeps.containsKey(loc)) {
-        res.addAll(this.locationToDeps.get(loc));
+        for (Dependency dep : this.locationToDeps.get(loc)) {
+          if (depPassesFilters(allowedPOSSet, allowedDepTypeSet,
+                               allowedRelationSet, dep, loc)) {
+            res.add(dep);
+          }
+        }
       }
     }
-    // TODO filtering
     return res;
+  }
+
+  private boolean depPassesFilters(Set<String> allowedPOSSet,
+                                   Set<String> allowedDepTypeSet,
+                                   Set<String> allowedRelationSet,
+                                   Dependency dep, TokenLocation loc) {
+    if (allowedPOSSet != null) {
+    }
+
+    if (allowedDepTypeSet != null) {
+    }
+
+    if (allowedRelationSet != null) {
+    }
+
+    return true;
+  }
+
+  /**
+   * returns null if input null
+   */
+  private Set<String> getSetFromCollection(Collection<String> coll) {
+    if (coll == null) {
+      return null;
+    }
+    if (coll instanceof Set) {
+      return (Set<String>) coll;
+    }
+    return new HashSet<String>(coll);
   }
 
   private static InputStream getXMLStream(String docID) {
