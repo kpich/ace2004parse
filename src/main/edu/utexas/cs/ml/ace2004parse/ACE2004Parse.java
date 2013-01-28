@@ -179,8 +179,13 @@ public class ACE2004Parse {
     Set<String> allowedPOSSet = getSetFromCollection(allowedPOS);
     Set<String> allowedDepTypeSet = getSetFromCollection(allowedDepTypes);
     Set<String> allowedRelationSet = getSetFromCollection(allowedRelations);
+    TokenLocation loc = null;
+    TokenLocation last = null;
     for (int i = unOffsetLhsChar; i <= unOffsetRhsChar; i++) {
-      TokenLocation loc = this.tokenLocations[i];
+      loc = this.tokenLocations[i];
+      if (last != null && last.equals(loc)) {
+        continue;
+      }
       if (this.locationToDeps.containsKey(loc)) {
         for (Dependency dep : this.locationToDeps.get(loc)) {
           if (depPassesFilters(allowedPOSSet, allowedDepTypeSet,
@@ -189,21 +194,54 @@ public class ACE2004Parse {
           }
         }
       }
+      last = loc;
     }
     return res;
   }
 
+  /**
+   * Returns true iff this particular dependency passes (possibly) all three
+   * filters.
+   *
+   * @param allowedPOSSet      The set of POS tags if, inside the relevant span,
+   *                           we return dependencies for.
+   * @param allowedDepTypeSet  The set of Dependency types (e.g. "nsubj") that
+   *                           we return dependencies for.
+   * @param allowedRelationSet The set of Relation types ("governor" or
+   *                           "dependent" that we reutrn dependencies for.
+   */
   private boolean depPassesFilters(Set<String> allowedPOSSet,
                                    Set<String> allowedDepTypeSet,
                                    Set<String> allowedRelationSet,
                                    Dependency dep, TokenLocation loc) {
     if (allowedPOSSet != null) {
+      TokenInfo tokInfo = this.tokenLocationToInfoMap.get(loc);
+      if (tokInfo != null && !allowedPOSSet.contains(tokInfo.getPOS())) {
+        return false;
+      }
     }
 
     if (allowedDepTypeSet != null) {
+      if (!allowedDepTypeSet.contains(dep.getType())) {
+        return false;
+      }
     }
 
     if (allowedRelationSet != null) {
+      int numAllowances = 0;
+      if (allowedRelationSet.contains("governor") &&
+          dep.getGovernor() != null &&
+          dep.getGovernor().equals(loc)) {
+        numAllowances++;
+      }
+      if (allowedRelationSet.contains("dependent") &&
+          dep.getDependent() != null &&
+          dep.getDependent().equals(loc)) {
+        numAllowances++;
+      }
+      if (numAllowances == 0) {
+        return false;
+      }
     }
 
     return true;

@@ -332,12 +332,15 @@ private static final String XML_PARSE_STRING =
     posList.add("NNS");
 
     // "Dogs" to "fun", inclusive, sent 1:
-    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0,
-                                                        OFFSET + 11, posList);
+    Set<Dependency> deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11,
+                                                       posList);
 
     // (nsubj, fun, Dogs):
     Dependency dep1 = new Dependency("nsubj", new TokenLocation(1, 3),
                                      new TokenLocation(1, 1));
+    // (cop, fun, are):
+    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
+                                     new TokenLocation(1, 2));
 
     HashSet<Dependency> expected = new HashSet<Dependency>();
     expected.add(dep1);
@@ -349,9 +352,15 @@ private static final String XML_PARSE_STRING =
     // "Dogs" to "fun", inclusive, sent 1:
     deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11, posList);
 
-    // (cop, fun, are):
-    Dependency dep2 = new Dependency("cop", new TokenLocation(1, 3),
-                                     new TokenLocation(1, 2));
+    expected = new HashSet<Dependency>();
+    expected.add(dep2);
+    assertEquals(expected, deps);
+
+    posList = new ArrayList<String>();
+    posList.add("NN");
+
+    // "Dogs" to "fun", inclusive, sent 1:
+    deps = parse.getDependenciesInSpan(OFFSET + 0, OFFSET + 11, posList);
 
     expected = new HashSet<Dependency>();
     expected.add(dep1);
