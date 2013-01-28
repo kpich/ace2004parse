@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -110,6 +111,65 @@ public class ACE2004Parse {
    * the annotated ACE 2004 corpus).
    */
   public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar) {
+    return getDependenciesInSpan(lhsChar, rhsChar, null, null, null);
+  }
+
+  /**
+   * This method returns dependencies that are related to any word in
+   * a span which is of one of the Parts of Speech in allowedPOS.
+   *
+   * allowedPOS may be null, in which case it behaves like the binary
+   * getDependenciesInSpan().
+   *
+   * lhsChar and rhsChar should be offset (that is, should be indexed like
+   * the annotated ACE 2004 corpus).
+   */
+  public List<Dependency> getDependenciesInSpan(int lhsChar, int rhsChar,
+                                                Collection<String> allowedPOS) {
+    return getDependenciesInSpan(lhsChar, rhsChar, allowedPOS, null, null);
+  }
+
+  /**
+   * Returns dependencies that are related to any word in a span which is of
+   * one of the Parts of Speech in allowedPOS, and such that the dependency type
+   * is one of the types in allowedDepTypes.
+   *
+   * If allowedPOS or allowedDepTypes is null, then it is considered to be the
+   * relevant maximal set (that is, no filtering based on that criterion is
+   * performed).
+   *
+   * lhsChar and rhsChar should be offset (that is, should be indexed like
+   * the annotated ACE 2004 corpus).
+   */
+  public List<Dependency> getDependenciesInSpan(
+      int lhsChar,
+      int rhsChar,
+      Collection<String> allowedPOS,
+      Collection<String> allowedDepTypes) {
+    return getDependenciesInSpan(lhsChar, rhsChar, allowedPOS, allowedDepTypes,
+                                 null);
+  }
+
+  /**
+   * Returns dependencies that are related to any word in a span which is of
+   * one of the Parts of Speech in allowedPOS, and such that the dependency type
+   * is one of the types in allowedDepTypes, and the word is related to the
+   * dependency via one of the relations in allowedRelations (which should have
+   * "governor", "dependent", neither, or both).
+   *
+   * If allowedPOS or allowedDepTypes is null, then it is considered to be the
+   * relevant maximal set (that is, no filtering based on that criterion is
+   * performed).
+   *
+   * lhsChar and rhsChar should be offset (that is, should be indexed like
+   * the annotated ACE 2004 corpus).
+   */
+  public List<Dependency> getDependenciesInSpan(
+      int lhsChar,
+      int rhsChar,
+      Collection<String> allowedPOS,
+      Collection<String> allowedDepTypes,
+      Collection<String> allowedRelations) {
     List<Dependency> res = new ArrayList<Dependency>();
     int unOffsetLhsChar = Math.max(lhsChar - this.offset, 0);
     int unOffsetRhsChar = Math.min(rhsChar - this.offset,
@@ -120,6 +180,7 @@ public class ACE2004Parse {
         res.addAll(this.locationToDeps.get(loc));
       }
     }
+    // TODO filtering
     return res;
   }
 
