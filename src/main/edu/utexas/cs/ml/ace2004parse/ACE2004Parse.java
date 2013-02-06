@@ -66,6 +66,7 @@ public class ACE2004Parse {
    */
   private Map<TokenLocation, List<Dependency>> locationToDeps;
 
+
   /**
    * Takes a docID, finds the file according to PARSE_DIR.
    */
@@ -77,6 +78,7 @@ public class ACE2004Parse {
    * Takes an InputStream pointing to the XML and the offset file.
    */
   public ACE2004Parse(InputStream xmlStream, InputStream offsetStream) {
+    long startTime = System.currentTimeMillis();
     readOffset(offsetStream);
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -93,6 +95,8 @@ public class ACE2004Parse {
     } catch (SAXException e) {
       e.printStackTrace();
     }
+    long endTime = System.currentTimeMillis();
+    System.out.println("ctor " +( (double)(endTime - startTime) / 1000));
   }
 
   /**
@@ -402,8 +406,7 @@ public class ACE2004Parse {
   private int getGovernorIndex(Node depNode)
           throws XPathExpressionException {
     Node gov = (Node) XPathFactory.newInstance().newXPath()
-                                  .compile("governor")
-                                  .evaluate(depNode, XPathConstants.NODE);
+                                  .evaluate("governor", depNode, XPathConstants.NODE);
     return Integer.parseInt(gov.getAttributes().getNamedItem("idx")
                                                .getNodeValue());
   }
@@ -411,8 +414,7 @@ public class ACE2004Parse {
   private int getDependentIndex(Node depNode)
           throws XPathExpressionException {
     Node gov = (Node) XPathFactory.newInstance().newXPath()
-                                  .compile("dependent")
-                                  .evaluate(depNode, XPathConstants.NODE);
+                                  .evaluate("dependent", depNode, XPathConstants.NODE);
     return Integer.parseInt(gov.getAttributes().getNamedItem("idx")
                                                .getNodeValue());
   }
@@ -420,15 +422,13 @@ public class ACE2004Parse {
   private NodeList getSentenceNodes(Document doc)
           throws XPathExpressionException {
     return (NodeList) XPathFactory.newInstance().newXPath()
-                                  .compile("//sentence")
-                                  .evaluate(doc, XPathConstants.NODESET);
+                                  .evaluate("//sentence", doc, XPathConstants.NODESET);
   }
 
   private NodeList getCollapsedDependencyNodes(Node sent)
           throws XPathExpressionException {
     return (NodeList) XPathFactory.newInstance().newXPath()
-                                  .compile("collapsed-dependencies/dep")
-                                  .evaluate(sent, XPathConstants.NODESET);
+                                  .evaluate("collapsed-dependencies/dep", sent, XPathConstants.NODESET);
   }
 
   private int getCharacterOffsetBegin(Node token)
@@ -468,16 +468,14 @@ public class ACE2004Parse {
   private String getStringTextProperty(Node n, String prop)
           throws XPathExpressionException {
     Node strNode = (Node) XPathFactory.newInstance().newXPath()
-                                      .compile(prop)
-                                      .evaluate(n, XPathConstants.NODE);
+                                      .evaluate(prop, n, XPathConstants.NODE);
     return strNode.getFirstChild().getNodeValue();
   }
 
   private NodeList getTokenNodesForSent(Node sent)
           throws XPathExpressionException {
     return (NodeList) XPathFactory.newInstance().newXPath()
-                      .compile("tokens/token")
-                      .evaluate(sent, XPathConstants.NODESET);
+                      .evaluate("tokens/token", sent, XPathConstants.NODESET);
   }
 
   private void DBG_printLocToDepMap() {
