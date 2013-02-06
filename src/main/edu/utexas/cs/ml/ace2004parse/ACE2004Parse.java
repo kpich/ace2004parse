@@ -67,10 +67,34 @@ public class ACE2004Parse {
   private Map<TokenLocation, List<Dependency>> locationToDeps;
 
 
+
+  /**
+   * Stores the things we've already read so we're not constantly doing
+   * file I/O.
+   *
+   * @TODO: switch to LRU cache
+   */
+  private static Map<String, ACE2004Parse> parseMap =
+      new HashMap<String, ACE2004Parse>();
+
+  /**
+   * Use this method to get a parse (it caches results so we don't perform
+   * redundant File IO)
+   */
+  public static ACE2004Parse getParse(String docID) {
+    if (ACE2004Parse.parseMap.containsKey(docID)) {
+      return ACE2004Parse.parseMap.get(docID);
+    }
+    ACE2004Parse parse = new ACE2004Parse(docID);
+    ACE2004Parse.parseMap.put(docID, parse);
+    return parse;
+  }
+
   /**
    * Takes a docID, finds the file according to PARSE_DIR.
+   * DON'T USE!
    */
-  public ACE2004Parse(String docID) {
+  protected ACE2004Parse(String docID) {
     this(getXMLStream(docID), getOffsetStream(docID));
   }
 
@@ -78,7 +102,6 @@ public class ACE2004Parse {
    * Takes an InputStream pointing to the XML and the offset file.
    */
   public ACE2004Parse(InputStream xmlStream, InputStream offsetStream) {
-    long startTime = System.currentTimeMillis();
     readOffset(offsetStream);
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -95,8 +118,6 @@ public class ACE2004Parse {
     } catch (SAXException e) {
       e.printStackTrace();
     }
-    long endTime = System.currentTimeMillis();
-    System.out.println("ctor " +( (double)(endTime - startTime) / 1000));
   }
 
   /**
